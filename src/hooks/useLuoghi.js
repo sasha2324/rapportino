@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { rimuoviCantiere, usaCantiere } from "../lib/cantieri.js";
-import { caricaCantieri, salvaCantieri } from "../lib/storage.js";
+import { rimuoviLuogo, usaLuogo } from "../lib/luoghi.js";
+import { caricaLuoghi, salvaLuoghi } from "../lib/storage.js";
 
-export function useCantieri() {
+export function useLuoghi() {
   const [elenco, setElenco] = useState([]);
   const [pronto, setPronto] = useState(false);
   const [errore, setErrore] = useState(false);
@@ -10,7 +10,7 @@ export function useCantieri() {
   const prontoRef = useRef(false);
 
   useEffect(() => {
-    caricaCantieri()
+    caricaLuoghi()
       .then((salvati) => {
         elencoRef.current = salvati;
         setElenco(salvati);
@@ -28,15 +28,15 @@ export function useCantieri() {
     elencoRef.current = nuovo;
     setElenco(nuovo);
     try {
-      await salvaCantieri(nuovo);
+      await salvaLuoghi(nuovo);
       setErrore(false);
     } catch {
       setErrore(true);
     }
   }, []);
 
-  const usa = useCallback((nome) => aggiorna(usaCantiere(elencoRef.current, nome)), [aggiorna]);
-  const rimuovi = useCallback((nome) => aggiorna(rimuoviCantiere(elencoRef.current, nome)), [aggiorna]);
+  const usa = useCallback((nome) => aggiorna(usaLuogo(elencoRef.current, nome)), [aggiorna]);
+  const rimuovi = useCallback((nome) => aggiorna(rimuoviLuogo(elencoRef.current, nome)), [aggiorna]);
 
   return { elenco, pronto, errore, usa, rimuovi };
 }

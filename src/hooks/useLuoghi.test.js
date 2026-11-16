@@ -2,32 +2,32 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act, waitFor, cleanup } from "@testing-library/react";
 
-const memoria = vi.hoisted(() => ({ cantieri: [] }));
+const memoria = vi.hoisted(() => ({ luoghi: [] }));
 vi.mock("../lib/storage.js", () => ({
-  caricaCantieri: vi.fn(async () => memoria.cantieri),
-  salvaCantieri: vi.fn(async (elenco) => {
-    memoria.cantieri = elenco;
+  caricaLuoghi: vi.fn(async () => memoria.luoghi),
+  salvaLuoghi: vi.fn(async (elenco) => {
+    memoria.luoghi = elenco;
   }),
 }));
 
-import { salvaCantieri } from "../lib/storage.js";
-import { useCantieri } from "./useCantieri.js";
+import { salvaLuoghi } from "../lib/storage.js";
+import { useLuoghi } from "./useLuoghi.js";
 
 beforeEach(() => {
-  memoria.cantieri = [];
+  memoria.luoghi = [];
   vi.clearAllMocks();
 });
 afterEach(cleanup);
 
 async function montaPronto() {
-  const r = renderHook(() => useCantieri());
+  const r = renderHook(() => useLuoghi());
   await waitFor(() => expect(r.result.current.pronto).toBe(true));
   return r;
 }
 
-describe("useCantieri", () => {
+describe("useLuoghi", () => {
   it("carica l'elenco salvato", async () => {
-    memoria.cantieri = [{ nome: "Via Roma 12", ultimoUso: 1 }];
+    memoria.luoghi = [{ nome: "Via Roma 12", ultimoUso: 1 }];
     const { result } = await montaPronto();
     expect(result.current.elenco).toEqual([{ nome: "Via Roma 12", ultimoUso: 1 }]);
   });
@@ -36,19 +36,19 @@ describe("useCantieri", () => {
     const { result } = await montaPronto();
     await act(() => result.current.usa("Via Roma 12"));
     expect(result.current.elenco.map((c) => c.nome)).toEqual(["Via Roma 12"]);
-    expect(memoria.cantieri[0].nome).toBe("Via Roma 12");
+    expect(memoria.luoghi[0].nome).toBe("Via Roma 12");
   });
 
   it("rimuovi toglie e salva", async () => {
-    memoria.cantieri = [{ nome: "Via Roma 12", ultimoUso: 1 }];
+    memoria.luoghi = [{ nome: "Via Roma 12", ultimoUso: 1 }];
     const { result } = await montaPronto();
     await act(() => result.current.rimuovi("via roma 12"));
     expect(result.current.elenco).toEqual([]);
-    expect(memoria.cantieri).toEqual([]);
+    expect(memoria.luoghi).toEqual([]);
   });
 
   it("errore se il salvataggio fallisce", async () => {
-    salvaCantieri.mockRejectedValueOnce(new Error("no"));
+    salvaLuoghi.mockRejectedValueOnce(new Error("no"));
     const { result } = await montaPronto();
     await act(() => result.current.usa("X"));
     expect(result.current.errore).toBe(true);

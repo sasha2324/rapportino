@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { usaCantiere, rimuoviCantiere, nomeConosciuto, suggerimenti } from "./cantieri.js";
+import { usaLuogo, rimuoviLuogo, nomeConosciuto, suggerimenti } from "./luoghi.js";
 
 const elenco = [
   { nome: "Via Roma 12", ultimoUso: 100 },
@@ -7,25 +7,25 @@ const elenco = [
   { nome: "Capannone Rossi", ultimoUso: 200 },
 ];
 
-describe("usaCantiere", () => {
+describe("usaLuogo", () => {
   it("aggiunge un nome nuovo, ripulito dagli spazi", () => {
-    expect(usaCantiere([], "  Via Verdi 3 ", 50)).toEqual([{ nome: "Via Verdi 3", ultimoUso: 50 }]);
+    expect(usaLuogo([], "  Via Verdi 3 ", 50)).toEqual([{ nome: "Via Verdi 3", ultimoUso: 50 }]);
   });
 
   it("non crea doppioni: tiene la prima grafia e aggiorna ultimoUso", () => {
-    const nuovo = usaCantiere(elenco, " via roma 12 ", 999);
+    const nuovo = usaLuogo(elenco, " via roma 12 ", 999);
     expect(nuovo).toHaveLength(3);
     expect(nuovo.find((c) => c.nome === "Via Roma 12").ultimoUso).toBe(999);
   });
 
   it("con un nome vuoto non cambia niente", () => {
-    expect(usaCantiere(elenco, "   ", 1)).toBe(elenco);
+    expect(usaLuogo(elenco, "   ", 1)).toBe(elenco);
   });
 });
 
-describe("rimuoviCantiere", () => {
-  it("toglie il cantiere senza badare a maiuscole", () => {
-    expect(rimuoviCantiere(elenco, "STABILIMENTO nord").map((c) => c.nome)).toEqual(["Via Roma 12", "Capannone Rossi"]);
+describe("rimuoviLuogo", () => {
+  it("toglie il luogo senza badare a maiuscole", () => {
+    expect(rimuoviLuogo(elenco, "STABILIMENTO nord").map((c) => c.nome)).toEqual(["Via Roma 12", "Capannone Rossi"]);
   });
 });
 
@@ -41,12 +41,12 @@ describe("suggerimenti", () => {
     expect(suggerimenti(elenco)).toEqual(["Stabilimento Nord", "Capannone Rossi", "Via Roma 12"]);
   });
 
-  it("il cantiere del giorno prima va per primo, senza doppioni", () => {
-    expect(suggerimenti(elenco, { cantiereIeri: "via roma 12" })).toEqual(["Via Roma 12", "Stabilimento Nord", "Capannone Rossi"]);
+  it("il luogo del giorno prima va per primo, senza doppioni", () => {
+    expect(suggerimenti(elenco, { luogoIeri: "via roma 12" })).toEqual(["Via Roma 12", "Stabilimento Nord", "Capannone Rossi"]);
   });
 
-  it("un cantiere di ieri che non è più in elenco viene ignorato", () => {
-    expect(suggerimenti(elenco, { cantiereIeri: "Tolto" })).toEqual(["Stabilimento Nord", "Capannone Rossi", "Via Roma 12"]);
+  it("un luogo di ieri che non è più in elenco viene ignorato", () => {
+    expect(suggerimenti(elenco, { luogoIeri: "Tolto" })).toEqual(["Stabilimento Nord", "Capannone Rossi", "Via Roma 12"]);
   });
 
   it("al massimo 5", () => {

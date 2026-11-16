@@ -1,23 +1,24 @@
 import { describe, it, expect } from "vitest";
-import { AZIENDA, partitaIvaValida, testoAzienda } from "./azienda.js";
+import { partitaIvaValida, testoAzienda } from "./azienda.js";
 
-const valore = (chiave) => AZIENDA.find((r) => r.chiave === chiave).valore;
-
-describe("dati dell'azienda", () => {
-  it("la partita IVA di esempio ha la cifra di controllo giusta", () => expect(partitaIvaValida(valore("partitaIva"))).toBe(true));
-  it("il codice SDI ha 7 caratteri", () => expect(valore("sdi")).toMatch(/^[A-Z0-9]{7}$/));
-  it("il testo da condividere ha una riga per voce", () => {
-    const righe = testoAzienda().split("\n");
-    expect(righe[0]).toBe("Dati per la fattura");
-    expect(righe).toContain("Partita IVA: 00000000000");
-    expect(righe).toContain("Codice SDI: 0000000");
-    expect(righe).toHaveLength(AZIENDA.length + 1);
+describe("testoAzienda", () => {
+  it("una riga per dato presente, sotto il titolo", () => {
+    const righe = [
+      { chiave: "nome", etichetta: "Ragione sociale", valore: "Azienda di esempio S.r.l." },
+      { chiave: "piva", etichetta: "Partita IVA", valore: "12345678903" },
+    ];
+    expect(testoAzienda(righe)).toBe(
+      "Dati per la fattura\nRagione sociale: Azienda di esempio S.r.l.\nPartita IVA: 12345678903"
+    );
   });
 });
 
 describe("partitaIvaValida", () => {
   // 12345678903: numero inventato per le prove, con la cifra di controllo giusta
-  it("accetta una partita IVA con la cifra di controllo giusta", () => expect(partitaIvaValida("12345678903")).toBe(true));
+  it("accetta una partita IVA con la cifra di controllo giusta", () => {
+    expect(partitaIvaValida("12345678903")).toBe(true);
+    expect(partitaIvaValida("00000000000")).toBe(true);
+  });
   it("riconosce una cifra sbagliata", () => expect(partitaIvaValida("12345678904")).toBe(false));
   it("riconosce due cifre scambiate", () => expect(partitaIvaValida("12354678903")).toBe(false));
   it("vuole 11 cifre", () => {

@@ -1,38 +1,22 @@
-export const CAMPI_ORE = [
-  { key: "oreLav", label: "Ore lavorate" },
-  { key: "viaggio", label: "Viaggio" },
-];
+/**
+ * Un giorno salvato è un oggetto { <id voce>: valore }: testo per ore, luogo, numero e note,
+ * vero/falso per i sì/no. I dati di voci tolte dal modulo restano lì, ma non si mostrano.
+ */
 
-export const CASELLE = [
-  { key: "scontrini", label: "Scontrini", excel: "Scontrini" },
-  { key: "fatture", label: "Fatture", excel: "Fatture" },
-  { key: "colazioni", label: "Colazioni", excel: "Colazioni" },
-  { key: "bb", label: "B&B (pernottamento)", excel: "B&B" },
-  { key: "pranzo", label: "Pranzo", excel: "Pranzo" },
-  { key: "cena", label: "Cena", excel: "Cena" },
-];
-
-export function giornoVuoto() {
-  return {
-    cantiere: "", oreLav: "", viaggio: "",
-    scontrini: false, fatture: false, colazioni: false, bb: false, pranzo: false, cena: false,
-    note: "",
-  };
-}
-
-/** Il giorno salvato, con i campi mancanti riempiti dai valori vuoti. */
 export function leggiGiorno(entries, numero) {
-  return { ...giornoVuoto(), ...(entries?.[numero] || {}) };
+  return entries?.[numero] ?? {};
 }
 
-export function isGiornoVuoto(g) {
-  if (!g) return true;
-  const testoVuoto = (v) => String(v ?? "").trim() === "";
-  return (
-    testoVuoto(g.cantiere) &&
-    testoVuoto(g.oreLav) &&
-    testoVuoto(g.viaggio) &&
-    CASELLE.every((c) => !g[c.key]) &&
-    testoVuoto(g.note)
-  );
+/** Il valore della voce nel giorno, con il vuoto giusto se manca o è del tipo sbagliato. */
+export function valoreVoce(giorno, voce) {
+  const valore = giorno?.[voce.id];
+  if (voce.tipo === "si_no") return valore === true;
+  return typeof valore === "string" ? valore : "";
+}
+
+export function isGiornoVuoto(giorno, voci) {
+  return voci.every((voce) => {
+    const valore = valoreVoce(giorno, voce);
+    return voce.tipo === "si_no" ? !valore : valore.trim() === "";
+  });
 }

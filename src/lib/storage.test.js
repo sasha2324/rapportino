@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { clear } from "idb-keyval";
 import {
   caricaMese, salvaMese, caricaImpostazioni, salvaImpostazioni,
-  caricaCantieri, salvaCantieri, chiediPersistenza,
+  caricaLuoghi, salvaLuoghi, chiediPersistenza,
 } from "./storage.js";
 
 beforeEach(async () => {
@@ -27,10 +27,10 @@ describe("storage", () => {
     expect(await caricaImpostazioni()).toEqual({ employeeName: "Mario Rossi" });
   });
 
-  it("elenco cantieri", async () => {
-    expect(await caricaCantieri()).toEqual([]);
-    await salvaCantieri([{ nome: "Via Roma 12", ultimoUso: 1 }]);
-    expect(await caricaCantieri()).toEqual([{ nome: "Via Roma 12", ultimoUso: 1 }]);
+  it("elenco dei luoghi", async () => {
+    expect(await caricaLuoghi()).toEqual([]);
+    await salvaLuoghi([{ nome: "Via Roma 12", ultimoUso: 1 }]);
+    expect(await caricaLuoghi()).toEqual([{ nome: "Via Roma 12", ultimoUso: 1 }]);
   });
 });
 
