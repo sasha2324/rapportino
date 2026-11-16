@@ -24,7 +24,7 @@ Build Vite con tre pagine HTML. L'app installabile (PWA) ha scope `/app/`.
 ```json
 {
   "v": 1,
-  "ts": 1763316000,
+  "ts": 1794816000,
   "azienda": { "nome": "", "sede": "", "piva": "", "sdi": "", "email": "", "tel": "" },
   "voci": [{ "id": "ore", "tipo": "ore", "nome": "Ore lavorate" }]
 }
