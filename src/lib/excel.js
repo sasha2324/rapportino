@@ -2,23 +2,15 @@ import * as XLSX from "xlsx";
 import { MESI, giorniNelMese, nomeGiorno, dataBreve } from "./calendario.js";
 import { leggiGiorno, valoreVoce } from "./giorno.js";
 import { leggiNumero, leggiOre, totaliMese, totaliPerLuogo } from "./ore.js";
+import { intestazioni, nomeColonna } from "./colonne.js";
+
+export { intestazioni };
 
 /**
  * L'Excel del mese: le colonne seguono le voci scelte dal titolare, nel loro ordine.
  * Ogni testo (nomi delle voci, luoghi, note) finisce in una cella di testo: SheetJS
  * scrive le stringhe come stringhe, quindi «=…» non diventa mai una formula.
  */
-
-function nomeColonna(voce) {
-  if (voce.tipo === "numero" && voce.unita && voce.unita.toLocaleLowerCase("it") !== voce.nome.toLocaleLowerCase("it")) {
-    return `${voce.nome} (${voce.unita})`;
-  }
-  return voce.nome;
-}
-
-export function intestazioni(voci) {
-  return ["Data", "Giorno", ...voci.map(nomeColonna)];
-}
 
 const LARGHEZZA = { ore: 9, numero: 9, si_no: 9, luogo: 22, note: 30 };
 const larghezze = (voci) => [11, 6, ...voci.map((v) => Math.max(LARGHEZZA[v.tipo], nomeColonna(v).length + 2))];
