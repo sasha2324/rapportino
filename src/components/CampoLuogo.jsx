@@ -1,34 +1,36 @@
 import { X } from "lucide-react";
-import { nomeConosciuto, suggerimenti } from "../lib/cantieri.js";
+import { nomeConosciuto, suggerimenti } from "../lib/luoghi.js";
 
 /**
- * cantieri: { elenco, usa, rimuovi } da useCantieri.
+ * Campo della voce di tipo luogo (Cantiere, Cliente, Sede… lo decide il titolare),
+ * con i luoghi già usati come pulsanti.
+ * luoghi: { elenco, usa, rimuovi } da useLuoghi.
  * I pulsanti usano onMouseDown preventDefault: toccarli non toglie il fuoco al campo,
- * così un nome scritto a metà non viene salvato come cantiere nuovo.
+ * così un nome scritto a metà non viene salvato come luogo nuovo.
  */
-export default function CampoCantiere({ valore, cantiereIeri, onCambia, cantieri }) {
-  const conosciuto = nomeConosciuto(cantieri.elenco, valore);
-  const lista = suggerimenti(cantieri.elenco, { testo: conosciuto ? "" : valore, cantiereIeri });
+export default function CampoLuogo({ etichetta, valore, luogoIeri, onCambia, luoghi }) {
+  const conosciuto = nomeConosciuto(luoghi.elenco, valore);
+  const lista = suggerimenti(luoghi.elenco, { testo: conosciuto ? "" : valore, luogoIeri });
 
   const scegli = (nome) => {
     onCambia(nome);
-    cantieri.usa(nome);
+    luoghi.usa(nome);
   };
 
   const conferma = (e) => {
-    if (e.relatedTarget?.closest?.(".cantiere__suggerimenti")) return;
+    if (e.relatedTarget?.closest?.(".luogo__suggerimenti")) return;
     const pulito = valore.trim();
-    const nome = nomeConosciuto(cantieri.elenco, pulito) ?? pulito;
+    const nome = nomeConosciuto(luoghi.elenco, pulito) ?? pulito;
     if (nome !== valore) onCambia(nome);
-    if (nome) cantieri.usa(nome);
+    if (nome) luoghi.usa(nome);
   };
 
   const tieniFuoco = (e) => e.preventDefault();
 
   return (
-    <div className="cantiere">
+    <div className="luogo">
       <label>
-        <span className="etichetta">Cantiere</span>
+        <span className="etichetta">{etichetta}</span>
         <span className="campo">
           <input
             type="text"
@@ -36,14 +38,14 @@ export default function CampoCantiere({ valore, cantiereIeri, onCambia, cantieri
             onChange={(e) => onCambia(e.target.value)}
             onBlur={conferma}
             onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
-            placeholder="Es. Via Roma 12 – Rossi"
+            placeholder="Scrivi o scegli qui sotto"
             autoComplete="off"
             enterKeyHint="done"
           />
         </span>
       </label>
       {lista.length > 0 && (
-        <div className="cantiere__suggerimenti">
+        <div className="luogo__suggerimenti">
           {lista.map((nome) => (
             <span key={nome} className={`suggerimento${nome === conosciuto ? " suggerimento--scelto" : ""}`}>
               <button type="button" className="suggerimento__nome" onMouseDown={tieniFuoco} onClick={() => scegli(nome)}>
@@ -53,7 +55,7 @@ export default function CampoCantiere({ valore, cantiereIeri, onCambia, cantieri
                 type="button"
                 className="suggerimento__togli"
                 onMouseDown={tieniFuoco}
-                onClick={() => cantieri.rimuovi(nome)}
+                onClick={() => luoghi.rimuovi(nome)}
                 aria-label={`Togli ${nome} dai suggerimenti`}
               >
                 <X size={14} />

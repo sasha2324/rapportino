@@ -1,12 +1,26 @@
 import { Check, LoaderCircle, Share2 } from "lucide-react";
 import { formatOre } from "../lib/ore.js";
 
-/** statoCondivisione: "fermo" | "in corso" | "fatto" */
-export default function BarraFondo({ totali, statoCondivisione, onCondividi }) {
+/**
+ * Totali del mese delle prime due voci di tipo ore, e il pulsante per l'Excel.
+ * statoCondivisione: "fermo" | "in corso" | "fatto"
+ */
+export default function BarraFondo({ totali, voci, statoCondivisione, onCondividi }) {
+  const [prima, seconda] = voci.filter((v) => v.tipo === "ore");
   return (
     <footer className="barra">
       <div className="barra__totali">
-        <b>{formatOre(totali.oreLav)}</b> h · <b>{formatOre(totali.viaggio)}</b> h viaggio
+        {prima && (
+          <>
+            <b>{formatOre(totali[prima.id] ?? 0)}</b> h
+          </>
+        )}
+        {seconda && (
+          <>
+            {" · "}
+            <b>{formatOre(totali[seconda.id] ?? 0)}</b> h {seconda.nome.toLocaleLowerCase("it")}
+          </>
+        )}
       </div>
       <button
         type="button"

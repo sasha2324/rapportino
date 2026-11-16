@@ -159,13 +159,13 @@ body::before {
 .giorno__data--oggi .giorno__numero,
 .giorno__data--oggi .giorno__settimana { color: #fff; font-weight: 800; }
 .giorno__riassunto { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.giorno__cantiere {
+.giorno__luogo {
   display: flex; align-items: center; gap: 4px; min-width: 0;
   font-size: 14px; font-weight: 700; color: var(--testo);
   overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
-.giorno__cantiere svg { flex-shrink: 0; color: var(--primario); }
-.giorno__cantiere--manca { font-weight: 600; font-style: italic; color: var(--grigio); }
+.giorno__luogo svg { flex-shrink: 0; color: var(--primario); }
+.giorno__luogo--manca { font-weight: 600; font-style: italic; color: var(--grigio); }
 .giorno__dettagli { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 12px; color: var(--testo-tenue); }
 .giorno__dettagli > svg { color: var(--testo-tenue); }
 .giorno__voce { display: inline-flex; align-items: center; gap: 3px; }
@@ -218,8 +218,8 @@ body::before {
   border: 1px solid var(--linea-campo); border-radius: 8px; font-size: 16px;
 }
 
-/* Campo cantiere */
-.cantiere__suggerimenti { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+/* Campo luogo (Cantiere, Cliente, Sede…) */
+.luogo__suggerimenti { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .suggerimento {
   display: inline-flex; align-items: center; overflow: hidden;
   background: #fff; border: 1px solid var(--linea-campo); border-radius: 999px;
@@ -296,3 +296,37 @@ body::before {
   width: 100%; margin-top: 14px; padding: 13px 16px;
   display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px;
 }
+
+/* Modulo aggiornato: incolla il link del titolare */
+.aggiorna { margin: 4px 12px 96px; text-align: center; }
+.aggiorna__apri {
+  display: inline-flex; align-items: center; gap: 6px; padding: 10px 12px;
+  background: none; border: none; color: var(--testo-tenue); font-size: 13px; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.aggiorna--aperto {
+  text-align: left; padding: 4px 14px 14px;
+  background: var(--carta); border: 1px solid var(--primario-bordo); border-radius: 12px;
+}
+.aggiorna__errore { margin: 8px 0 0; font-size: 14px; font-weight: 600; color: var(--primario-scuro); overflow-wrap: anywhere; }
+.aggiorna__azioni { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.aggiorna__nota { margin: 8px 0 0; font-size: 12px; color: var(--grigio); }
+.aggiorna__fatto {
+  display: inline-flex; align-items: center; gap: 6px; margin: 0 0 4px;
+  color: var(--verde); font-size: 14px; font-weight: 700;
+}
+
+/* Nessun modulo: link non valido o app aperta senza link */
+.schermata-errore {
+  max-width: 460px; margin: 0 auto; padding: calc(48px + env(safe-area-inset-top)) 20px 32px; text-align: center;
+}
+.schermata-errore__icona { color: var(--primario); }
+.schermata-errore h1 { margin: 12px 0 8px; font-size: 22px; font-weight: 800; color: var(--testo); }
+.schermata-errore p { margin: 0 0 10px; font-size: 15px; line-height: 1.5; color: var(--testo-tenue); }
+.schermata-errore__dettaglio {
+  padding: 10px 12px; background: var(--primario-chiaro); border-radius: 8px;
+  font-size: 13px !important; text-align: left; overflow-wrap: anywhere;
+}
+.schermata-errore .aggiorna { margin: 20px 0 0; }
+.schermata-errore__piede { margin-top: 28px !important; font-size: 13px !important; }
+.schermata-errore__piede a { color: var(--primario); }

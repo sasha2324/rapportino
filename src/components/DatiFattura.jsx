@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Copy, Share2, X } from "lucide-react";
-import { AZIENDA, testoAzienda } from "../lib/azienda.js";
+import { testoAzienda } from "../lib/azienda.js";
+import { righeAzienda } from "../lib/configurazione.js";
 
 /**
- * Foglio con i dati dell'azienda per la fattura: si mostra alla cassa,
- * si copia una voce alla volta o si mandano tutti i dati (es. su WhatsApp).
+ * Foglio con i dati dell'azienda per la fattura (dalla configurazione): si mostra alla
+ * cassa, si copia una voce alla volta o si mandano tutti i dati (es. su WhatsApp).
  */
-export default function DatiFattura({ onChiudi }) {
+export default function DatiFattura({ azienda, onChiudi }) {
+  const righe = righeAzienda(azienda);
   const [copiato, setCopiato] = useState(null);
   const chiudiRef = useRef(null);
   const onChiudiRef = useRef(onChiudi);
@@ -30,7 +32,7 @@ export default function DatiFattura({ onChiudi }) {
   };
 
   const inviaTutto = async () => {
-    const testo = testoAzienda();
+    const testo = testoAzienda(righe);
     if (navigator.share) {
       try {
         await navigator.share({ title: "Dati per la fattura", text: testo });
@@ -60,7 +62,7 @@ export default function DatiFattura({ onChiudi }) {
         <p className="foglio__aiuto">Mostra questa schermata alla cassa, oppure copia i dati che ti chiedono.</p>
 
         <dl className="dati-azienda">
-          {AZIENDA.map((r) => (
+          {righe.map((r) => (
             <div key={r.chiave} className="dati-azienda__riga">
               <div>
                 <dt>{r.etichetta}</dt>

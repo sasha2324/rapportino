@@ -1,9 +1,10 @@
 import Giorno from "./Giorno.jsx";
 import { giorniNelMese } from "../lib/calendario.js";
-import { leggiGiorno } from "../lib/giorno.js";
+import { leggiGiorno, valoreVoce } from "../lib/giorno.js";
 
-export default function ElencoGiorni({ anno, mese, entries, oggi, giornoAperto, onApri, onAggiorna, cantieri, onDatiFattura }) {
+export default function ElencoGiorni({ anno, mese, entries, voci, oggi, giornoAperto, onApri, onAggiorna, luoghi, onDatiFattura }) {
   const numGiorni = giorniNelMese(anno, mese);
+  const voceLuogo = voci.find((v) => v.tipo === "luogo");
   return (
     <main className="elenco">
       {Array.from({ length: numGiorni }, (_, i) => i + 1).map((d) => (
@@ -13,12 +14,13 @@ export default function ElencoGiorni({ anno, mese, entries, oggi, giornoAperto, 
           mese={mese}
           numero={d}
           giorno={leggiGiorno(entries, d)}
+          voci={voci}
           oggi={oggi === d}
-          cantiereIeri={d > 1 ? leggiGiorno(entries, d - 1).cantiere : ""}
+          luogoIeri={voceLuogo && d > 1 ? valoreVoce(leggiGiorno(entries, d - 1), voceLuogo) : ""}
           aperto={giornoAperto === d}
           onApri={() => onApri(giornoAperto === d ? null : d)}
           onAggiorna={(campo, valore) => onAggiorna(d, campo, valore)}
-          cantieri={cantieri}
+          luoghi={luoghi}
           onDatiFattura={onDatiFattura}
         />
       ))}
