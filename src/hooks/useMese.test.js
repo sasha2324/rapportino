@@ -27,37 +27,36 @@ afterEach(cleanup);
 
 describe("useMese", () => {
   it("carica i dati del mese", async () => {
-    memoria.set("2026-10", { 1: { oreLav: "8" } });
+    memoria.set("2026-10", { 1: { ore: "8" } });
     const { result } = monta();
     expect(result.current.caricamento).toBe(true);
     await pronto(result);
-    expect(result.current.entries).toEqual({ 1: { oreLav: "8" } });
+    expect(result.current.entries).toEqual({ 1: { ore: "8" } });
   });
 
   it("aggiorna subito e salva poco dopo", async () => {
     const { result } = monta();
     await pronto(result);
-    act(() => result.current.aggiornaGiorno(2, "oreLav", "8"));
-    expect(result.current.entries[2].oreLav).toBe("8");
-    expect(result.current.entries[2].cantiere).toBe("");
+    act(() => result.current.aggiornaGiorno(2, "ore", "8"));
+    expect(result.current.entries[2].ore).toBe("8");
     expect(result.current.statoSalvataggio).toBe("salvataggio");
     await waitFor(() => expect(result.current.statoSalvataggio).toBe("salvato"));
-    expect(memoria.get("2026-10")[2].oreLav).toBe("8");
+    expect(memoria.get("2026-10")[2].ore).toBe("8");
   });
 
   it("cambiando mese salva subito la modifica in attesa", async () => {
     const { result, rerender } = monta();
     await pronto(result);
-    act(() => result.current.aggiornaGiorno(2, "oreLav", "8"));
+    act(() => result.current.aggiornaGiorno(2, "ore", "8"));
     rerender({ anno: 2026, mese: 11 });
     await pronto(result);
-    expect(salvaMese).toHaveBeenCalledWith(2026, 10, expect.objectContaining({ 2: expect.objectContaining({ oreLav: "8" }) }));
-    expect(memoria.get("2026-10")[2].oreLav).toBe("8");
+    expect(salvaMese).toHaveBeenCalledWith(2026, 10, expect.objectContaining({ 2: expect.objectContaining({ ore: "8" }) }));
+    expect(memoria.get("2026-10")[2].ore).toBe("8");
     expect(result.current.entries).toEqual({});
   });
 
   it("durante il caricamento non mostra i dati del mese prima", async () => {
-    memoria.set("2026-10", { 1: { oreLav: "8" } });
+    memoria.set("2026-10", { 1: { ore: "8" } });
     const { result, rerender } = monta();
     await pronto(result);
     rerender({ anno: 2026, mese: 11 });

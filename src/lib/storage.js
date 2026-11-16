@@ -3,6 +3,7 @@ import { chiaveMese } from "./calendario.js";
 
 const CHIAVE_IMPOSTAZIONI = "settings";
 const CHIAVE_LUOGHI = "luoghi";
+const CHIAVE_CONFIGURAZIONE = "configurazione";
 
 export async function caricaMese(anno, mese) {
   return (await get(chiaveMese(anno, mese))) ?? {};
@@ -18,6 +19,15 @@ export async function caricaImpostazioni() {
 
 export async function salvaImpostazioni(impostazioni) {
   await set(CHIAVE_IMPOSTAZIONI, impostazioni);
+}
+
+/** La configurazione del modulo in uso (va sempre ricontrollata: vedi avvio.js). */
+export async function caricaConfigurazione() {
+  return (await get(CHIAVE_CONFIGURAZIONE)) ?? null;
+}
+
+export async function salvaConfigurazione(config) {
+  await set(CHIAVE_CONFIGURAZIONE, config);
 }
 
 export async function caricaLuoghi() {

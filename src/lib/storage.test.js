@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { clear } from "idb-keyval";
 import {
   caricaMese, salvaMese, caricaImpostazioni, salvaImpostazioni,
-  caricaLuoghi, salvaLuoghi, chiediPersistenza,
+  caricaLuoghi, salvaLuoghi, caricaConfigurazione, salvaConfigurazione, chiediPersistenza,
 } from "./storage.js";
 
 beforeEach(async () => {
@@ -25,6 +25,19 @@ describe("storage", () => {
     expect(await caricaImpostazioni()).toEqual({ employeeName: "" });
     await salvaImpostazioni({ employeeName: "Mario Rossi" });
     expect(await caricaImpostazioni()).toEqual({ employeeName: "Mario Rossi" });
+  });
+
+  it("configurazione del modulo: nessuna all'inizio, poi quella salvata", async () => {
+    expect(await caricaConfigurazione()).toBeNull();
+    const config = { v: 1, ts: 1794816000, voci: [{ id: "ore", tipo: "ore", nome: "Ore" }] };
+    await salvaConfigurazione(config);
+    expect(await caricaConfigurazione()).toEqual(config);
+  });
+
+  it("i dati dei mesi restano quando cambia la configurazione", async () => {
+    await salvaMese(2026, 10, { 2: { ore: "8", cena: true } });
+    await salvaConfigurazione({ v: 1, ts: 1794816000, voci: [{ id: "ore", tipo: "ore", nome: "Ore" }] });
+    expect(await caricaMese(2026, 10)).toEqual({ 2: { ore: "8", cena: true } });
   });
 
   it("elenco dei luoghi", async () => {
