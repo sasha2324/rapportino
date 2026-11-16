@@ -21,7 +21,7 @@ Progetto approvato: `docs/superpowers/specs/2026-11-16-rapportino-configurazione
 
 | File | Responsabilità |
 |---|---|
-| `src/lib/configurazione.js` (nuovo) | `TIPI`, `LIMITI`, `validaConfigurazione(dato)`, `controllaCampoAzienda(chiave, valore)`, `idDaNome(nome, usati)`, `righeAzienda(azienda)`, `nomeVoceVuota(tipo)` |
+| `src/lib/configurazione.js` (nuovo) | `TIPI`, `LIMITI`, `validaConfigurazione(dato)`, `controllaCampoAzienda(chiave, valore)`, `idDaNome(nome, usati)`, `righeAzienda(azienda)` |
 | `src/lib/link.js` (nuovo) | `codifica(config)`, `decodifica(testo)`, `linkApp(config, origine)`, `testoDaLink(testo)` (accetta link intero o solo la parte dopo `#`) |
 | `src/lib/modelli.js` (nuovo) | `MODELLI` (4 modelli), `configDaModello(id, ts)` |
 | `src/lib/avvio.js` (nuovo) | `scegliConfigurazione({ dalLink, salvata })` |

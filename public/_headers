@@ -1,8 +1,12 @@
-# Regole per Netlify (valgono anche con Netlify Drop): pagina, service worker e manifest
-# sempre aggiornati, così le nuove versioni arrivano subito ai telefoni.
+# Intestazioni HTTP (Cloudflare Pages le legge da qui).
+# Sicurezza: solo file di questo sito, nessuno script o stile esterno, niente iframe,
+# niente moduli inviati altrove. Il manifest dell'app è un Blob creato in pagina (blob:).
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; manifest-src 'self' blob:; worker-src 'self'; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+
+# Service worker sempre aggiornato, così le nuove versioni arrivano subito ai telefoni
 /sw.js
-  Cache-Control: no-cache
-/index.html
-  Cache-Control: no-cache
-/manifest.webmanifest
   Cache-Control: no-cache
