@@ -10,8 +10,9 @@ sul telefono. Non sostituisce il sistema ufficiale di rilevazione presenze.
 vite-plugin-pwa, dati nel telefono con IndexedDB (idb-keyval), Excel con SheetJS, QR code
 con `uqr`, test con Vitest. Nessun server, nessun account, nessun database.
 
-**Stato:** in sviluppo, repository privato, nome provvisorio. Prima della pubblicazione va
-provata l'installazione su un iPhone e un Android veri.
+**Stato:** in sviluppo, nome provvisorio. Prova online: <https://rapportino-2bu.pages.dev>
+(Cloudflare Pages, si aggiorna a ogni push su `main`). L'installazione va ancora provata a
+fondo su iPhone e Android veri.
 
 ## Le pagine
 

@@ -6,7 +6,10 @@ Avvio e comandi: README.md. Progetto: `docs/superpowers/specs/2026-11-16-rapport
 
 ## Regole
 
-- Repository **privato** finché Sasha non l'ha controllato e decide di renderlo pubblico.
+- Repository **pubblico** (dal 16/11/2026): ogni commit si vede, anche l'indirizzo dell'autore
+  (usare quello anonimo di GitHub, già impostato nel repository).
+- Pubblicazione: Cloudflare Pages (progetto «rapportino», https://rapportino-2bu.pages.dev),
+  automatica a ogni push su `main`.
 - Nessun dato di aziende o persone reali, né nel codice né nei test né negli esempi:
   solo valori chiaramente finti («Azienda di esempio S.r.l.», `example.com`, `12345678903`,
   «Mario Rossi»). Prima di ogni commit cercare tracce di dati veri.
