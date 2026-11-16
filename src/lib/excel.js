@@ -1,55 +1,78 @@
 import * as XLSX from "xlsx";
 import { MESI, giorniNelMese, nomeGiorno, dataBreve } from "./calendario.js";
-import { CASELLE, leggiGiorno } from "./giorno.js";
-import { leggiOre, totaliMese, totaliPerCantiere } from "./ore.js";
+import { leggiGiorno, valoreVoce } from "./giorno.js";
+import { leggiNumero, leggiOre, totaliMese, totaliPerLuogo } from "./ore.js";
 
-export const INTESTAZIONI = [
-  "Data", "Giorno", "Cantiere", "Ore lav.", "Viaggio",
-  ...CASELLE.map((c) => c.excel),
-  "Note",
-];
+/**
+ * L'Excel del mese: le colonne seguono le voci scelte dal titolare, nel loro ordine.
+ * Ogni testo (nomi delle voci, luoghi, note) finisce in una cella di testo: SheetJS
+ * scrive le stringhe come stringhe, quindi «=…» non diventa mai una formula.
+ */
 
-const LARGHEZZE = [11, 6, 22, 9, 9, 9, 8, 9, 6, 8, 7, 30];
+function nomeColonna(voce) {
+  if (voce.tipo === "numero" && voce.unita && voce.unita.toLocaleLowerCase("it") !== voce.nome.toLocaleLowerCase("it")) {
+    return `${voce.nome} (${voce.unita})`;
+  }
+  return voce.nome;
+}
+
+export function intestazioni(voci) {
+  return ["Data", "Giorno", ...voci.map(nomeColonna)];
+}
+
+const LARGHEZZA = { ore: 9, numero: 9, si_no: 9, luogo: 22, note: 30 };
+const larghezze = (voci) => [11, 6, ...voci.map((v) => Math.max(LARGHEZZA[v.tipo], nomeColonna(v).length + 2))];
 
 /** Numero se valido, vuoto se vuoto, il testo scritto se non valido (così l'ufficio lo vede). */
-function cellaOre(testo) {
-  const o = leggiOre(testo);
-  if (o.stato === "vuoto") return "";
-  if (o.stato === "valido") return o.valore;
+function cellaNumero(testo, leggi) {
+  const letto = leggi(testo);
+  if (letto.stato === "vuoto") return "";
+  if (letto.stato === "valido") return letto.valore;
   return String(testo).trim();
 }
 
-export function righeExcel({ nomeDipendente, anno, mese, entries }) {
+function cella(giorno, voce) {
+  const valore = valoreVoce(giorno, voce);
+  switch (voce.tipo) {
+    case "ore":
+      return cellaNumero(valore, leggiOre);
+    case "numero":
+      return cellaNumero(valore, leggiNumero);
+    case "si_no":
+      return valore ? "X" : "";
+    default:
+      return valore.trim();
+  }
+}
+
+export function righeExcel({ config, nomeDipendente, anno, mese, entries }) {
+  const voci = config.voci;
   const numGiorni = giorniNelMese(anno, mese);
-  const righe = [
-    [`Dipendente: ${String(nomeDipendente ?? "").trim() || "-"}`],
-    [`Periodo: ${MESI[mese]} ${anno}`],
-    [],
-    INTESTAZIONI,
-  ];
+  const righe = [];
+  if (config.azienda?.nome) righe.push([`Azienda: ${config.azienda.nome}`]);
+  righe.push([`Dipendente: ${String(nomeDipendente ?? "").trim() || "-"}`]);
+  righe.push([`Periodo: ${MESI[mese]} ${anno}`]);
+  righe.push([]);
+  righe.push(intestazioni(voci));
+
   for (let d = 1; d <= numGiorni; d++) {
     const g = leggiGiorno(entries, d);
-    righe.push([
-      dataBreve(anno, mese, d),
-      nomeGiorno(anno, mese, d),
-      String(g.cantiere).trim(),
-      cellaOre(g.oreLav),
-      cellaOre(g.viaggio),
-      ...CASELLE.map((c) => (g[c.key] ? "X" : "")),
-      String(g.note).trim(),
-    ]);
+    righe.push([dataBreve(anno, mese, d), nomeGiorno(anno, mese, d), ...voci.map((v) => cella(g, v))]);
   }
-  const t = totaliMese(entries, numGiorni);
-  righe.push([]);
-  righe.push(["", "Totale", "", t.oreLav, t.viaggio, ...CASELLE.map((c) => t[c.key]), ""]);
 
-  // Totale per cantiere: colonne allineate a Cantiere / Ore lav. / Viaggio della tabella sopra
-  const perCantiere = totaliPerCantiere(entries, numGiorni);
-  if (perCantiere.length > 0) {
+  const t = totaliMese(entries, numGiorni, voci);
+  righe.push([]);
+  righe.push(["", "Totale", ...voci.map((v) => (v.id in t ? t[v.id] : ""))]);
+
+  // Ore per luogo: una tabellina sotto, con il nome che il titolare ha dato alla voce luogo
+  const voceLuogo = voci.find((v) => v.tipo === "luogo");
+  const perLuogo = totaliPerLuogo(entries, numGiorni, voci);
+  if (voceLuogo && perLuogo.length > 0) {
+    const vociOre = voci.filter((v) => v.tipo === "ore");
     righe.push([]);
-    righe.push(["", "Totale per cantiere"]);
-    righe.push(["", "", "Cantiere", "Ore lav.", "Viaggio"]);
-    perCantiere.forEach((c) => righe.push(["", "", c.cantiere, c.oreLav, c.viaggio]));
+    righe.push(["", `Totale per ${voceLuogo.nome.toLocaleLowerCase("it")}`]);
+    righe.push(["", voceLuogo.nome, ...vociOre.map((v) => v.nome)]);
+    perLuogo.forEach((r) => righe.push(["", r.luogo, ...vociOre.map((v) => r.ore[v.id])]));
   }
   return righe;
 }
@@ -67,9 +90,9 @@ export function nomeFileExcel(nomeDipendente, anno, mese) {
  * Crea il file Excel del mese. È sincrona di proposito: deve girare nello stesso
  * tocco del pulsante, prima di navigator.share (vedi share.js).
  */
-export function creaFileExcel({ nomeDipendente, anno, mese, entries }) {
-  const ws = XLSX.utils.aoa_to_sheet(righeExcel({ nomeDipendente, anno, mese, entries }));
-  ws["!cols"] = LARGHEZZE.map((wch) => ({ wch }));
+export function creaFileExcel({ config, nomeDipendente, anno, mese, entries }) {
+  const ws = XLSX.utils.aoa_to_sheet(righeExcel({ config, nomeDipendente, anno, mese, entries }));
+  ws["!cols"] = larghezze(config.voci).map((wch) => ({ wch }));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Ore");
   const dati = XLSX.write(wb, { bookType: "xlsx", type: "array" });
