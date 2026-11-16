@@ -1,0 +1,8 @@
+# Regole per Netlify (valgono anche con Netlify Drop): pagina, service worker e manifest
+# sempre aggiornati, così le nuove versioni arrivano subito ai telefoni.
+/sw.js
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/manifest.webmanifest
+  Cache-Control: no-cache
