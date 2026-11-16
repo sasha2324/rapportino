@@ -1,6 +1,21 @@
 import { X } from "lucide-react";
 import { nomeConosciuto, suggerimenti } from "../lib/luoghi.js";
 
+/** Esegue `azione` subito dopo il prossimo rilascio di dito o mouse (dopo il clic), al massimo entro 1 s. */
+function dopoIlRilascio(azione) {
+  let fatto = false;
+  const esegui = () => {
+    if (fatto) return;
+    fatto = true;
+    clearTimeout(riserva);
+    document.removeEventListener("pointerup", rilascio, true);
+    azione();
+  };
+  const rilascio = () => setTimeout(esegui, 0);
+  const riserva = setTimeout(esegui, 1000);
+  document.addEventListener("pointerup", rilascio, { capture: true, once: true });
+}
+
 /**
  * Campo della voce di tipo luogo (Cantiere, Cliente, Sede… lo decide il titolare),
  * con i luoghi già usati come pulsanti.
@@ -21,8 +36,15 @@ export default function CampoLuogo({ etichetta, valore, luogoIeri, onCambia, luo
     if (e.relatedTarget?.closest?.(".luogo__suggerimenti")) return;
     const pulito = valore.trim();
     const nome = nomeConosciuto(luoghi.elenco, pulito) ?? pulito;
-    if (nome !== valore) onCambia(nome);
-    if (nome) luoghi.usa(nome);
+    const salva = () => {
+      if (nome !== valore) onCambia(nome);
+      if (nome) luoghi.usa(nome);
+    };
+    // Se il fuoco passa a un pulsante (es. una casella), il dito o il mouse è ancora premuto:
+    // salvare subito farebbe comparire i suggerimenti, che spostano il pulsante prima del
+    // rilascio, e il tocco andrebbe perso. Si salva dopo il rilascio (o comunque entro 1 s).
+    if (e.relatedTarget?.tagName === "BUTTON") dopoIlRilascio(salva);
+    else salva();
   };
 
   const tieniFuoco = (e) => e.preventDefault();
